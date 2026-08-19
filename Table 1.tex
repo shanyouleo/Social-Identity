@@ -1,0 +1,45 @@
+\begin{table}[H]
+\centering
+\caption{Task Shares and Perceived Closeness in the Baseline Experiment}
+\footnotesize
+\begin{threeparttable}
+\begin{tabular}{l*{6}{c}}
+\toprule\toprule
+& \multicolumn{6}{c}{Dep. Var: Task Shares $s_{ijt}$ (\%)} \\
+& \multicolumn{3}{c}{H--H and H--GPT} & \multicolumn{3}{c}{H--H and H--DS} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7}
+& Distant & Close & Pooled & Distant & Close & Pooled \\
+& {\scriptsize IOS$_{\text{GPT}}<$ IOS$_{\text{H}}$} & {\scriptsize IOS$_{\text{GPT}}\geq$ IOS$_{\text{H}}$} & & {\scriptsize IOS$_{\text{DS}}<$ IOS$_{\text{H}}$} & {\scriptsize IOS$_{\text{DS}}\geq$ IOS$_{\text{H}}$} & \\
+& (1) & (2) & (3) & (4) & (5) & (6) \\
+\midrule
+\midrule
+GPT         &                -2.374\sym{*}  &                -0.086         &                -2.005         &                               &                               &                               \\
+            &       [-4.245,-0.503]         &        [-1.391,1.219]         &        [-5.446,1.436]         &                               &                               &                               \\
+\addlinespace
+IOS$_{\text{GPT}}\times$ GPT&                               &                               &                 0.918\sym{*}  &                               &                               &                               \\
+            &                               &                               &         [0.004,1.832]         &                               &                               &                               \\
+\addlinespace
+IOS$_{\text{H}}\times$ GPT&                               &                               &                -0.572         &                               &                               &                               \\
+            &                               &                               &        [-1.504,0.360]         &                               &                               &                               \\
+\addlinespace
+DS          &                               &                               &                               &                -3.228\sym{***}&                -0.903         &                -4.056\sym{**} \\
+            &                               &                               &                               &       [-4.847,-1.608]         &        [-2.207,0.401]         &       [-7.088,-1.024]         \\
+\addlinespace
+IOS$_{\text{DS}}\times$ DS&                               &                               &                               &                               &                               &                 1.122\sym{**} \\
+            &                               &                               &                               &                               &                               &         [0.320,1.924]         \\
+\addlinespace
+IOS$_{\text{H}}\times$ DS&                               &                               &                               &                               &                               &                -0.324         \\
+            &                               &                               &                               &                               &                               &        [-1.078,0.431]         \\
+\midrule
+Individual FE&                   Yes         &                   Yes         &                   Yes         &                   Yes         &                   Yes         &                   Yes         \\
+Round FE    &                   Yes         &                   Yes         &                   Yes         &                   Yes         &                   Yes         &                   Yes         \\
+Observations&                 7,788         &                 5,456         &                13,244         &                 8,800         &                 4,444         &                13,244         \\
+$R^2$       &                 0.644         &                 0.603         &                 0.626         &                 0.628         &                 0.616         &                 0.624         \\
+\bottomrule\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\footnotesize
+\item Notes: 95\% confidence intervals in brackets, clustered at the individual level. ***$p<0.001$, **$p<0.01$, *$p<0.05$.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
