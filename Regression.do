@@ -1,35 +1,34 @@
 clear all
-
-*---------------------------------------------------------------*
-* 0. 定义当前路径
-*---------------------------------------------------------------*
-cd "/Users/youshan/Library/CloudStorage/Dropbox/Revealed Consistency in Food Choices/Replication Code and Data/Results"
-
+set more off
+local results_dir "/Users/youshan/Documents/Research/Replication Code and Data/Results"
+capture mkdir "`results_dir'"
+cd "`results_dir'"
 
 
-* 1. 数据导入（从当前路径读取）
+
+* 1. Import data from the working directory
 import delimited "regress_data_wide_baseline.csv", clear
 
-* 2. 处理组 dummy
+* 2. Treatment indicators
 gen GPT = (condition == 2)
 gen DS  = (condition == 3)
 
-* 3. 因变量（share）
+* 3. Outcome variable: task share
 replace ytask = ytask
 
-* 4. 创建 round_type（3 类）
+* 4. Create three round-type categories
 gen round_type = .
 replace round_type = 1 if inlist(round, 2, 8, 10, 12, 13, 14, 16, 18, 20, 22)
 replace round_type = 2 if inlist(round, 1, 3, 4, 6, 9, 11, 15, 17, 19, 21)
 replace round_type = 3 if inlist(round, 5, 7)
 
 *---------------------------------------------------------------*
-* 回归（只跑一次，全样本），并对 GPT = DS 做 Wald 检验
+* Run regressions and Wald tests for GPT = DS
 *---------------------------------------------------------------*
 
 est clear
 
-* (1) 只控制 round FE（无个体 FE）
+* (1) Control only for round fixed effects
 reghdfe ytask GPT DS, absorb(round) cluster(prolificid)
 test GPT = DS
 estadd scalar p_wald = r(p)
@@ -37,7 +36,7 @@ estadd local IndFE   "No"
 estadd local RoundFE "Yes"
 est store m1
 
-* (2) 同时控制个体 FE 和 round FE（全样本）
+* (2) Control for individual and round fixed effects
 reghdfe ytask GPT DS, absorb(prolificid round) cluster(prolificid)
 test GPT = DS
 estadd scalar p_wald = r(p)
@@ -45,7 +44,7 @@ estadd local IndFE   "Yes"
 estadd local RoundFE "Yes"
 est store m2
 
-* (3) 子样本：r1 < r2（round_type==1）
+* (3) Subsample: r1 < r2（round_type==1）
 reghdfe ytask GPT DS if round_type == 1, absorb(prolificid round) cluster(prolificid)
 test GPT = DS
 estadd scalar p_wald = r(p)
@@ -53,7 +52,7 @@ estadd local IndFE   "Yes"
 estadd local RoundFE "Yes"
 est store m3
 
-* (4) 子样本：r1 = r2（round_type==3）
+* (4) Subsample: r1 = r2（round_type==3）
 reghdfe ytask GPT DS if round_type == 3, absorb(prolificid round) cluster(prolificid)
 test GPT = DS
 estadd scalar p_wald = r(p)
@@ -61,7 +60,7 @@ estadd local IndFE   "Yes"
 estadd local RoundFE "Yes"
 est store m4
 
-* (5) 子样本：r1 > r2（round_type==2）
+* (5) Subsample: r1 > r2（round_type==2）
 reghdfe ytask GPT DS if round_type == 2, absorb(prolificid round) cluster(prolificid)
 test GPT = DS
 estadd scalar p_wald = r(p)
@@ -70,7 +69,7 @@ estadd local RoundFE "Yes"
 est store m5
 
 *---------------------------------------------------------------*
-* 输出表格（Wald 检验 p 值在表格底部一起汇报）
+* Export the table with Wald-test p-values
 *---------------------------------------------------------------*
 
 esttab m1 m2 m3 m4 m5 ///
@@ -121,28 +120,27 @@ esttab m1 m2 m3 m4 m5 ///
 * Task Shares and Perceived Closeness in the Baseline Experiment
 *===============================================================================
 clear all
-
-*---------------------------------------------------------------*
-* 0. 定义当前路径
-*---------------------------------------------------------------*
-cd "/Users/youshan/Library/CloudStorage/Dropbox/Revealed Consistency in Food Choices/Replication Code and Data/Results"
+set more off
+local results_dir "/Users/youshan/Documents/Research/Replication Code and Data/Results"
+capture mkdir "`results_dir'"
+cd "`results_dir'"
 
 
 
 import delimited "regress_data_wide_baseline.csv", clear
 
 *-------------------------------------------------------------------------------
-* 变量构造
+* Construct variables
 *-------------------------------------------------------------------------------
-* 处理组虚拟变量
+* Treatment indicators
 gen GPT = (condition == 2)
 gen DS  = (condition == 3)
 
-* IOS 差异（AI vs Human）
+* IOS differences between AI and human
 gen diff_ios_gpt = ios_gpt - ios_human
 gen diff_ios_ds  = ios_ds  - ios_human
 
-* 交互项（显式生成，便于 esttab 标注）
+* Generate interaction terms for esttab labels
 gen iosgpt_x_gpt = ios_gpt   * GPT
 gen iosh_x_gpt   = ios_human * GPT
 gen iosds_x_ds   = ios_ds    * DS
@@ -166,7 +164,7 @@ estadd local indFE   "Yes"
 estadd local roundFE "Yes"
 est store m2
 
-* (3) Pooled: 连续 IOS 交互
+* (3) Pooled: Continuous IOS interactions
 reghdfe ytask GPT iosgpt_x_gpt iosh_x_gpt if condition <= 2, ///
     absorb(prolificid round) cluster(prolificid)
 estadd local indFE   "Yes"
@@ -191,7 +189,7 @@ estadd local indFE   "Yes"
 estadd local roundFE "Yes"
 est store m5
 
-* (6) Pooled: 连续 IOS 交互
+* (6) Pooled: Continuous IOS interactions
 reghdfe ytask DS iosds_x_ds iosh_x_ds if inlist(condition, 1, 3), ///
     absorb(prolificid round) cluster(prolificid)
 estadd local indFE   "Yes"
@@ -199,10 +197,10 @@ estadd local roundFE "Yes"
 est store m6
 
 *===============================================================================
-* 输出 LaTeX 表格
+* Export the LaTeX table
 *===============================================================================
 esttab m1 m2 m3 m4 m5 m6 ///
-    using "Table 2.tex", replace ///
+    using "Table 1.tex", replace ///
     booktabs fragment nomtitles nonumbers ///
     keep(GPT iosgpt_x_gpt iosh_x_gpt DS iosds_x_ds iosh_x_ds) ///
     order(GPT iosgpt_x_gpt iosh_x_gpt DS iosds_x_ds iosh_x_ds) ///
@@ -251,10 +249,10 @@ esttab m1 m2 m3 m4 m5 m6 ///
 
 
 *===============================================================================
-* Section 1: 交互项的经济学含义 (IOS 一个标准差变化对 ytask 的影响)
+* Section 1: Economic interpretation of a one-SD change in IOS
 *===============================================================================
 
-* 循环参数: 处理组 | IOS 变量 | 交互项 | Pooled 模型 | 样本条件
+* Loop inputs: treatment, IOS variable, interaction, pooled model, and sample condition
 local treats  "GPT DS"
 local iosvar_GPT   "ios_gpt"
 local iosvar_DS    "ios_ds"
@@ -267,7 +265,7 @@ local sample_DS    "inlist(condition, 1, 3)"
 
 foreach t of local treats {
 
-    *--- Step 1: 与回归样本一致, 个体层面去重后计算 IOS 标准差 ---
+    *--- Step 1: Compute IOS SD at the individual level in the estimation sample ---
     preserve
         quietly keep if `sample_`t''
         quietly bysort prolificid: keep if _n == 1
@@ -276,7 +274,7 @@ foreach t of local treats {
         local n_`t'  = r(N)
     restore
 
-    *--- Step 2: 提取交互项系数, 计算 1 SD 效应 (lincom 含 SE / CI) ---
+    *--- Step 2: Compute the one-SD effect with lincom standard errors and confidence intervals ---
     quietly est restore `model_`t''
     local b_`t' = _b[`inter_`t'']
 
@@ -290,17 +288,17 @@ foreach t of local treats {
     local hi_`t'  = `eff_`t'' + invttail(`df', 0.025)*`se_`t''
 }
 
-*--- 汇总输出 ---
+*--- Print summary output ---
 foreach t of local treats {
     di as text "{hline 66}"
-    di as text "经济学含义: IOS_`t' × `t'  (Pooled 模型 `model_`t'')"
+    di as text "Economic interpretation: IOS_`t' × `t'  (pooled model `model_`t'')"
     di as text "{hline 66}"
-    di as text "  去重后个体数                = " as result %9.0f  `n_`t''
-    di as text "  IOS_`t' 标准差 (个体层面)   = " as result %9.4f `sd_`t''
-    di as text "  交互项系数                  = " as result %9.4f `b_`t''
-    di as text "  1 SD 变化对 ytask 的影响    = " as result %9.4f `eff_`t'' ///
+    di as text "  Number of unique participants                = " as result %9.0f  `n_`t''
+    di as text "  IOS_`t' SD at the individual level   = " as result %9.4f `sd_`t''
+    di as text "  Interaction coefficient                  = " as result %9.4f `b_`t''
+    di as text "  Effect of a one-SD change on ytask    = " as result %9.4f `eff_`t'' ///
        as text "  (se = " as result %6.4f `se_`t'' as text ")"
-    di as text "  双侧 p 值                   = " as result %9.4f `p_`t''
+    di as text "  Two-sided p-value                   = " as result %9.4f `p_`t''
     di as text "  95% CI                      = [" as result %8.4f `lo_`t'' ///
        as text ", " as result %8.4f `hi_`t'' as text "]"
 }
@@ -308,12 +306,12 @@ di as text "{hline 66}"
 
 
 *===============================================================================
-* Section 2: 分组系数差异检验 (z-test, Distant vs. Close)
+* Section 2: Coefficient-difference tests by subgroup (z-test, Distant vs. Close)
 *===============================================================================
 
 capture program drop coef_compare
 program define coef_compare
-    * 用法: coef_compare 模型A 模型B 系数名 "标签A" "标签B"
+    * Syntax: coef_compare modelA modelB coefficient "labelA" "labelB"
     args mA mB coef labA labB
 
     quietly est restore `mA'
@@ -332,16 +330,16 @@ program define coef_compare
     local hi   = `diff' + invnormal(0.975)*`sed'
 
     di as text "{hline 66}"
-    di as text "`coef' 系数比较: `labA' (`mA') vs. `labB' (`mB')"
+    di as text "`coef' coefficient comparison: `labA' (`mA') vs. `labB' (`mB')"
     di as text "{hline 66}"
     di as text "  `mA' (`labA'):  b = " as result %8.4f `bA' ///
        as text "   se = " as result %7.4f `seA'
     di as text "  `mB' (`labB'):  b = " as result %8.4f `bB' ///
        as text "   se = " as result %7.4f `seB'
-    di as text "  系数差异 (bA - bB)  = " as result %8.4f `diff'
-    di as text "  差异的标准误        = " as result %8.4f `sed'
-    di as text "  z 统计量            = " as result %8.4f `z'
-    di as text "  双侧 p 值           = " as result %8.4f `p'
+    di as text "  Coefficient difference (bA - bB)  = " as result %8.4f `diff'
+    di as text "  Standard error of the difference        = " as result %8.4f `sed'
+    di as text "  z-statistic            = " as result %8.4f `z'
+    di as text "  Two-sided p-value           = " as result %8.4f `p'
     di as text "  95% CI              = [" as result %8.4f `lo' ///
        as text ", " as result %8.4f `hi' as text "]"
 end
@@ -360,10 +358,12 @@ di as text "{hline 66}"
 
 
 clear all
-
-cd "/Users/youshan/Library/CloudStorage/Dropbox/Revealed Consistency in Food Choices/Replication Code and Data/Results"
+set more off
+local results_dir "/Users/youshan/Documents/Research/Replication Code and Data/Results"
+capture mkdir "`results_dir'"
+cd "`results_dir'"
 *===============================================================================
-* 0. 数据导入与处理组变量
+* 0. Import data and create treatment indicators
 *===============================================================================
 import delimited ///
     "regress_data_wide_baseline.csv", ///
@@ -374,7 +374,7 @@ gen DS  = (condition == 3)
 	
 	
 *===============================================================================
-* 1. 回归 + 经济学含义 (1 SD of AI intensity)
+* 1. Regressions and one-SD AI-intensity effects
 *===============================================================================
 local intensity_vars ai_days1 ai_days2 ai_hours1 ai_hours2 ///
                      improvement_scores1 improvement_scores2
@@ -390,15 +390,15 @@ foreach v of local intensity_vars {
         c.ai_intensity##c.DS ///
         , absorb(round prolificid) cluster(prolificid)
 
-    *--- (a) 回归样本内、个体层面的 AI intensity 标准差 -----------------------
+    *--- (a) Individual-level SD of AI intensity in the estimation sample -----------------------
     preserve
         keep if e(sample)
-        bysort prolificid: keep if _n == 1     // 每人一条
+        bysort prolificid: keep if _n == 1     // One row per participant
         qui sum ai_intensity
         local sd_int = r(sd)
     restore
 
-    *--- (b) 1 SD 变化对应的处理效应异质性 (lincom 自动给出 SE 和 CI) ---------
+    *--- (b) Treatment-effect heterogeneity for a one-SD change ---------
     * GPT
     lincom `sd_int' * c.ai_intensity#c.GPT
     estadd scalar eff_gpt    = r(estimate)
@@ -413,7 +413,7 @@ foreach v of local intensity_vars {
 
     estadd scalar sd_int = `sd_int'
 
-    *--- (c) 屏幕上打印一段可读的解释 -----------------------------------------
+    *--- (c) Print a readable interpretation -----------------------------------------
     di as text _n "===== Model `i' (`v') ====="
     di as text "SD of AI intensity (individual level): " as result %6.3f `sd_int'
     di as text "1 SD -> GPT effect: " as result %6.3f _b[c.ai_intensity#c.GPT]*`sd_int' ///
@@ -482,20 +482,26 @@ esttab m1 m2 m3 m4 m5 m6 ///
 	
 	
 	
+clear all
+set more off
+local results_dir "/Users/youshan/Documents/Research/Replication Code and Data/Results"
+capture mkdir "`results_dir'"
+cd "`results_dir'"
+
 /********************************************************************
-* 2. 个体 × condition × round 维度：ytask
-*    （单次回归 + 系数两两 Wald 检验，双 Panel 输出）
+* 2. Individual-by-condition-by-round panel: ytask
+*    Single regressions with pairwise Wald tests and two-panel output
 ********************************************************************/
 
 *===========================================================
-* 0. 路径设置：从当前工作目录读取
+* 0. Path settings
 *===========================================================
-local path "/Users/youshan/Library/CloudStorage/Dropbox/Revealed Consistency in Food Choices/Replication Code and Data/Results"
+local path "/Users/youshan/Documents/Research/Replication Code and Data/Results"
 local filename "Extended Data Table 5.tex"
 local caption  "Task Shares in the Minimal and Political Group Experiments"
 
 *===========================================================
-* 1. 定义小程序：回归 + Wald 检验 + 存储
+* 1. Define a helper for regressions, Wald tests, and storage
 *===========================================================
 capture program drop run_reg
 program define run_reg
@@ -505,7 +511,7 @@ program define run_reg
     estadd local IndFE   "Yes"
     estadd local RoundFE "Yes"
 
-    * ---- Wald 检验：系数两两比较 ----
+    * ---- Wald tests for pairwise coefficient equality ----
     quietly test H_d = AI_s
     local p1 = cond(r(p)<0.001, "\$<\$0.001", string(r(p), "%9.3f"))
     estadd local p_H_AIin "`p1'"
@@ -522,7 +528,7 @@ program define run_reg
 end
 
 *===========================================================
-* 2. 定义数据准备小程序（两个 study 共用）
+* 2. Define shared data-preparation helper
 *===========================================================
 capture program drop prep_data
 program define prep_data
@@ -559,7 +565,7 @@ run_reg m7 if round_type == 3       // (3) r1 = r2
 run_reg m8 if round_type == 2       // (4) r1 > r2
 
 *==================================================================
-* 3. 输出表格：Panel (a) Minimal / Panel (b) Political
+* 3. Export the table: Panel (a) Minimal and Panel (b) Political
 *==================================================================
 
 * -------- Panel (a): Minimal --------
@@ -651,20 +657,22 @@ esttab m5 m6 m7 m8 using "`filename'", append ///
 	
 	
 clear all
-
-cd "/Users/youshan/Library/CloudStorage/Dropbox/Revealed Consistency in Food Choices/Replication Code and Data/Results"
+set more off
+local results_dir "/Users/youshan/Documents/Research/Replication Code and Data/Results"
+capture mkdir "`results_dir'"
+cd "`results_dir'"
 	
 
 ********************************************************************************
-* 整合后的回归代码 - 合并 Minimal 与 Political 两个样本
-* 输出表格式参考: Extended Data Table 7
+* Pooled regressions combining Minimal and Political samples
+* Output format follows: Extended Data Table 7
 ********************************************************************************
 
 *------------------------------*
-* 1. 读取并合并两个数据集
+* 1. Read and append the two datasets
 *------------------------------*
 
-* 读取 Political 样本
+* Read the Political sample
 import delimited ///
     "regress_data_wide_political.csv", ///
     clear
@@ -673,29 +681,29 @@ gen sample = "political"
 tempfile political_data
 save `political_data'
 
-* 读取 Minimal 样本
+* Read the Minimal sample
 import delimited ///
     "regress_data_wide_minimal.csv", ///
     clear
 gen sample = "minimal"
 
-* 上下合并
+* Append datasets
 append using `political_data'
 
 
-* 处理组虚拟变量
+* Treatment indicators
 gen H_d  = (condition==2)
 gen AI_s = (condition==3)
 gen AI_d = (condition==4)
 
 *==========================================================*
-* Step 3: 回归 (循环: Panel x Measure)
+* Notes and section labels standardized in English.
 *
-* 经济学意义: 交互项系数 x 处理组 closeness 的被试层面 SD
-* 注意: 每个被试有 22 rounds 重复观测, 需先按被试去重再算 SD
+* Notes and section labels standardized in English.
+* Each participant has 22 rounds; compute SD after keeping one row per participant
 *==========================================================*
 
-* --- Panel 设定: 处理组 dummy 与对应 condition ---
+* Notes and section labels standardized in English.
 local dummy_A "H_d"
 local dummy_B "AI_s"
 local dummy_C "AI_d"
@@ -703,12 +711,12 @@ local cond_A  2
 local cond_B  3
 local cond_C  4
 
-* --- In-group (baseline) closeness 变量 (三种度量) ---
+* --- In-group baseline closeness measures ---
 local in_ios  "ios_human_same"
 local in_like "hs_like"
 local in_care "hs_care"
 
-* --- 处理组 closeness 变量 ---
+* --- Treatment closeness measures ---
 local tr_A_ios  "ios_human_different"
 local tr_A_like "hd_like"
 local tr_A_care "hd_care"
@@ -726,7 +734,7 @@ foreach p in A B C {
 
     foreach m in ios like care {
 
-        * 统一变量名, 便于 esttab 跨列对齐
+        * Use common variable names for esttab alignment
         gen C_in    = `in_`m''
         gen C_treat = `tr_`p'_`m''
 
@@ -737,12 +745,12 @@ foreach p in A B C {
             , absorb(prolificid round) cluster(prolificid)
 
         *----------------------------------------------------------*
-        * 经济学意义: 1 SD 的 C_treat 变化对处理效应的影响
+        * Effect of a one-SD change in C_treat on the treatment effect
         *----------------------------------------------------------*
         preserve
-            keep if e(sample)                        // 只保留回归实际样本
-            duplicates drop prolificid, force  // 每个被试仅保留一行
-            * 如只想在处理组内计算 SD, 加: keep if `D'==1
+            keep if e(sample)                        // Keep the estimation sample only
+            duplicates drop prolificid, force  // Keep one row per participant
+            * To compute SD within the treatment group only, add: keep if `D'==1
             qui sum C_treat
             local sd = r(sd)
         restore
@@ -756,7 +764,7 @@ foreach p in A B C {
            as text " [95% CI: " as result %6.3f `lb' as text ", " ///
            as result %6.3f `ub' as text "]"
 
-        * 存入 estimates, 输出到表格
+        * Store estimates for table output
         estadd scalar sd_x      = `sd'
         estadd scalar sd_effect = r(estimate)
         estadd scalar sd_se     = r(se)
@@ -771,7 +779,7 @@ foreach p in A B C {
 }
 
 *==========================================================*
-* Step 4: 输出 LaTeX 表格
+* Step 4: Export the LaTeX table
 *==========================================================*
 local tabfile "Extended Data Table 7.tex"
 local statsblock ///
@@ -868,20 +876,22 @@ esttab pC_ios pC_like pC_care using "`tabfile'", append ///
 	
 	
 clear all
-
-cd "/Users/youshan/Library/CloudStorage/Dropbox/Revealed Consistency in Food Choices/Replication Code and Data/Results"
+set more off
+local results_dir "/Users/youshan/Documents/Research/Replication Code and Data/Results"
+capture mkdir "`results_dir'"
+cd "`results_dir'"
 	
 
 ********************************************************************************
-* 整合后的回归代码 - 合并 Minimal 与 Political 两个样本
-* 输出表格式参考: Extended Data Table 8
+* Pooled regressions combining Minimal and Political samples
+* Output format follows: Extended Data Table 8
 ********************************************************************************
 
 *------------------------------*
-* 1. 读取并合并两个数据集
+* 1. Read and append the two datasets
 *------------------------------*
 
-* 读取 Political 样本
+* Read the Political sample
 import delimited ///
     "regress_data_wide_political.csv", ///
     clear
@@ -890,26 +900,26 @@ gen sample = "political"
 tempfile political_data
 save `political_data'
 
-* 读取 Minimal 样本
+* Read the Minimal sample
 import delimited ///
     "regress_data_wide_minimal.csv", ///
     clear
 gen sample = "minimal"
 
-* 上下合并
+* Append datasets
 append using `political_data'
 
 
 encode prolificid, gen(newid)
 
-* 处理组虚拟变量
+* Treatment indicators
 gen H_d  = (condition == 2)   // Human, out-group
 gen AI_s = (condition == 3)   // AI, in-group
 gen AI_d = (condition == 4)   // AI, out-group
 
 *------------------------------*
-* 2. 循环运行六个回归
-*    每列使用一种 AI usage intensity 度量
+* Notes and section labels standardized in English.
+*    Each column uses one AI-usage intensity measure
 *------------------------------*
 
 local intvars ai_days1 ai_days2 ai_hours1 ai_hours2 ///
@@ -918,7 +928,7 @@ local intvars ai_days1 ai_days2 ai_hours1 ai_hours2 ///
 local i = 1
 foreach v of local intvars {
 
-    gen ai_int = `v'   // 统一变量名，保证各列系数名一致
+    gen ai_int = `v'   // Use a common variable name to align coefficients across columns
 
     reghdfe ytask ///
         c.ai_int##c.H_d ///
@@ -935,7 +945,7 @@ foreach v of local intvars {
 }
 
 ********************************************************************************
-* 3. 输出 LaTeX 表格
+* 3. Export the LaTeX table
 ********************************************************************************
 
 esttab m1 m2 m3 m4 m5 m6 ///
@@ -995,13 +1005,15 @@ esttab m1 m2 m3 m4 m5 m6 ///
 	
 	
 clear all
-
-cd "/Users/youshan/Library/CloudStorage/Dropbox/Revealed Consistency in Food Choices/Replication Code and Data/Results"	
+set more off
+local results_dir "/Users/youshan/Documents/Research/Replication Code and Data/Results"
+capture mkdir "`results_dir'"
+cd "`results_dir'"	
 ********************************************************************************
-* 合并两个数据集
+* Append the two datasets
 ********************************************************************************
 
-* 读取第一个数据集 (Minimal Sample)
+* Read the Minimal sample
 import delimited ///
     "regress_data_wide_minimal.csv", ///
     clear
@@ -1013,7 +1025,7 @@ replace prolificid = "min_" + prolificid
 tempfile minimal_data
 save `minimal_data'
 
-* 读取第二个数据集 (Political Sample)
+* Read the Political sample
 import delimited ///
     "regress_data_wide_political.csv", ///
     clear
@@ -1022,24 +1034,24 @@ gen study = 2
 tostring prolificid, replace force
 replace prolificid = "pol_" + prolificid
 
-* 合并
+* Notes and section labels standardized in English.
 append using `minimal_data'
 
-* 生成数值型 id 用于固定效应
+* Create a numeric ID for fixed effects
 encode prolificid, gen(id_num)
 
 ********************************************************************************
-* 数据准备与回归
+* Prepare data and run regressions
 ********************************************************************************
 
 eststo clear
 
-* 处理组虚拟变量
+* Treatment indicators
 gen H_d  = (condition==2)
 gen AI_s = (condition==3)
 gen AI_d = (condition==4)
 
-* 变量顺序与参考表一致：
+* Variable order matches the table layout:
 * Writing / Practical Guidance / Technical Help / Multimedia /
 * Seeking Information / Self-Expression / Other-Unknown
 local varlist "writing practicalguidance technicalhelp multimedia seekinginformation expressionandinteraction other_use"
@@ -1051,7 +1063,7 @@ foreach var of local varlist {
     reghdfe ytask c.temp_exp##c.H_d c.temp_exp##c.AI_s c.temp_exp##c.AI_d, ///
         absorb(id_num round) cluster(id_num)
 
-    * --- 计算并存储 AI_activity 的均值（估计样本内）---
+    * --- Compute and store the mean of AI_activity in the estimation sample---
     quietly summarize temp_exp if e(sample)
     local mval : display %4.1f 100*r(mean)
     estadd local MeanAI "`mval'\%"
@@ -1066,7 +1078,7 @@ foreach var of local varlist {
 }
 
 ********************************************************************************
-* 输出 LaTeX 表格
+* Export the LaTeX table
 ********************************************************************************
 
 esttab m1 m2 m3 m4 m5 m6 m7 ///
@@ -1137,9 +1149,13 @@ esttab m1 m2 m3 m4 m5 m6 m7 ///
 	
 	
 	
-cd "/Users/youshan/Library/CloudStorage/Dropbox/Revealed Consistency in Food Choices/Replication Code and Data/Results"		
-	
-	********************************************************************************
+clear all
+set more off
+local results_dir "/Users/youshan/Documents/Research/Replication Code and Data/Results"
+capture mkdir "`results_dir'"
+cd "`results_dir'"
+
+********************************************************************************
 * Table: Task Shares and Perceived Relationship with AI
 * Pooled Minimal + Political samples; two-panel layout (cols 1-4 / 5-9)
 ********************************************************************************
@@ -1147,7 +1163,7 @@ cd "/Users/youshan/Library/CloudStorage/Dropbox/Revealed Consistency in Food Cho
 eststo clear
 
 ********************************************************************************
-* Step 1: 读取并准备 Minimal Sample
+* Step 1: Read and prepare the Minimal sample
 ********************************************************************************
 import delimited ///
     "regress_data_wide_minimal.csv", ///
@@ -1161,7 +1177,7 @@ tempfile minimal_data
 save `minimal_data'
 
 ********************************************************************************
-* Step 2: 读取并准备 Political Sample
+* Step 2: Read and prepare the Political sample
 ********************************************************************************
 import delimited ///
     "regress_data_wide_political.csv", ///
@@ -1172,20 +1188,20 @@ tostring prolificid, replace
 replace prolificid = "pol_" + prolificid
 
 ********************************************************************************
-* Step 3: 合并两个数据集
+* Step 3: Append the two datasets
 ********************************************************************************
 append using `minimal_data'
 
-* 处理组虚拟变量
+* Treatment indicators
 gen H_d  = (condition==2)
 gen AI_s = (condition==3)
 gen AI_d = (condition==4)
 
-* 聚类用数值型 id
+* Numeric ID for clustering
 encode prolificid, gen(id_num)
 
 ********************************************************************************
-* Step 4: 运行 9 个回归（顺序与表格列一致）
+* Step 4: Run nine regressions in table-column order
 ********************************************************************************
 local varlist "smart_assistant collaborative_partner knowledge_consultant social_companion functional_tool big_tech potential_risk_threat not_use_genai other_relations"
 local i = 1
@@ -1209,7 +1225,7 @@ foreach var of local varlist {
 }
 
 ********************************************************************************
-* Step 5: 输出 LaTeX 表格（上下两个面板）
+* Notes and section labels standardized in English.
 ********************************************************************************
 
 *--- Panel A: columns (1)-(4) ---*
