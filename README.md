@@ -1,4 +1,4 @@
-#"Social Identity and Human-AI Task Allocation"
+# "Social Identity and Human-AI Task Allocation"
 
 **Authors:** Yiting Chen, You Shan, and Shuangyu Yang
 
