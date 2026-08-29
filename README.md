@@ -16,7 +16,7 @@ Replication proceeds in two sequential steps. **Step 1 (Python).** Run each of t
 
 ## Mapping of Exhibits to Programs
 
-The baseline notebook (`python_baseline.ipynb`) produces Fig.2(a), Fig.2(b), Fig.3, Fig.S1(a), Fig.S1(b), Fig.S2(a), and Fig.S3(a). The minimal-group notebook (`python_minimal.ipynb`) produces Fig.4(a), Fig.S2(b), Fig.S3(b), Fig.S4(a), Fig.S5(a), Fig.S6(a), Fig.S7(a), and Table S6(a). The political-group notebook (`python_political.ipynb`) produces Fig.4(b), Fig.S2(c), Fig.S3(c), Fig.S4(b), Fig.S5(b), Fig.S6(b), Fig.S7(b), and Table S6(b). The Stata do-file (`Regression.do`) produces Table 2 and Table S3, Table S4, Table S5, Table S7, Table S8, and Table S9. Table S2 (sample demographics) is reported in the demographics sections of the three notebooks. All output files are written to `Results/` under names matching the exhibit labels in the manuscript.
+The baseline notebook (`python_baseline.ipynb`) produces Fig.2(a), Fig.2(b), Fig.3, Fig.S1(a), Fig.S1(b), Fig.S2(a), and Fig.S3(a). The minimal-group notebook (`python_minimal.ipynb`) produces Fig.4(a), Fig.S2(b), Fig.S3(b), Fig.S4(a), Fig.S5(a), Fig.S6(a), Fig.S7(a), and TableS6(a). The political-group notebook (`python_political.ipynb`) produces Fig.4(b), Fig.S2(c), Fig.S3(c), Fig.S4(b), Fig.S5(b), Fig.S6(b), Fig.S7(b), and TableS6(b). The Stata do-file (`Regression.do`) produces Table2 and TableS3, TableS4, TableS5, TableS7, TableS8, and TableS9. TableS2 (sample demographics) is reported in the demographics sections of the three notebooks. All output files are written to `Results/` under names matching the exhibit labels in the manuscript.
 
 ## Computational Requirements
 
