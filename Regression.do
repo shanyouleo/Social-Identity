@@ -2,7 +2,7 @@ clear all
 set more off
 
 * Change this to your do-file's directory
-local project_dir "/Users/youshan/Library/CloudStorage/Dropbox/Revealed Consistency in Food Choices/Replication Code and Data_PNAS"
+local project_dir "/Users/youshan/Documents/Research/Replication Code and Data_PNAS"
 
 local results_dir "`project_dir'/Results"
 capture mkdir "`results_dir'"
@@ -82,7 +82,7 @@ esttab m1 m2 m3 m4 m5 ///
     keep(GPT DS) ///
     order(GPT DS) ///
     nomtitles ///
-    ci(3) b(3) ///
+    se(3) b(3) ///
     star(* 0.1 ** 0.05 *** 0.01) ///
     s(IndFE RoundFE N r2 p_wald, ///
       label("Individual FE" "Round FE" "Observations" "\$R^2\$" "Wald test \$p\$-value (GPT = DS)") ///
@@ -127,7 +127,7 @@ clear all
 set more off
 
 * Change this to your do-file's directory
-local project_dir "/Users/youshan/Library/CloudStorage/Dropbox/Revealed Consistency in Food Choices/Replication Code and Data_PNAS"
+local project_dir "/Users/youshan/Documents/Research/Replication Code and Data_PNAS"
 
 local results_dir "`project_dir'/Results"
 capture mkdir "`results_dir'"
@@ -219,7 +219,7 @@ esttab m1 m2 m3 m4 m5 m6 ///
         iosds_x_ds   "IOS\$_{\text{DS}}\times\$ DS" ///
         iosh_x_ds    "IOS\$_{\text{H}}\times\$ DS" ///
     ) ///
-    ci(3) b(3) ///
+    se(3) b(3) ///
     star(* 0.1 ** 0.05 *** 0.01) ///
     s(indFE roundFE N r2, ///
       label("Individual FE" "Round FE" "Observations" "\$R^2\$") ///
@@ -368,7 +368,7 @@ clear all
 set more off
 
 * Change this to your do-file's directory
-local project_dir "/Users/youshan/Library/CloudStorage/Dropbox/Revealed Consistency in Food Choices/Replication Code and Data_PNAS"
+local project_dir "/Users/youshan/Documents/Research/Replication Code and Data_PNAS"
 
 local results_dir "`project_dir'/Results"
 capture mkdir "`results_dir'"
@@ -447,7 +447,7 @@ esttab m1 m2 m3 m4 m5 m6 ///
         c.ai_intensity#c.GPT "\$AI_{intensity} \times GPT\$" ///
         c.ai_intensity#c.DS  "\$AI_{intensity} \times DS\$" ///
     ) ///
-    ci(3) b(3) ///
+    se(3) b(3) ///
     star(* 0.1 ** 0.05 *** 0.01) ///
     s(sd_int eff_gpt eff_ds indFE roundFE N r2, ///
       label("SD of \$AI_{intensity}\$" ///
@@ -497,7 +497,7 @@ clear all
 set more off
 
 * Change this to your do-file's directory
-local project_dir "/Users/youshan/Library/CloudStorage/Dropbox/Revealed Consistency in Food Choices/Replication Code and Data_PNAS"
+local project_dir "/Users/youshan/Documents/Research/Replication Code and Data_PNAS"
 
 local results_dir "`project_dir'/Results"
 capture mkdir "`results_dir'"
@@ -592,7 +592,7 @@ esttab m1 m2 m3 m4 using "`filename'", replace ///
                AI_s "\$AI_{in}\$" ///
                AI_d "\$AI_{out}\$") ///
     nomtitles ///
-    ci(3) b(3) ///
+    se(3) b(3) ///
     star(* 0.1 ** 0.05 *** 0.01) ///
     s(p_H_AIin p_H_AIout p_AIin_AIout IndFE RoundFE N r2, ///
       label("\$p\;(H_{out} = AI_{in})\$" ///
@@ -630,7 +630,7 @@ esttab m5 m6 m7 m8 using "`filename'", append ///
                AI_s "\$AI_{in}\$" ///
                AI_d "\$AI_{out}\$") ///
     nomtitles nonumbers ///
-    ci(3) b(3) ///
+    se(3) b(3) ///
     star(* 0.1 ** 0.05 *** 0.01) ///
     s(p_H_AIin p_H_AIout p_AIin_AIout IndFE RoundFE N r2, ///
       label("\$p\;(H_{out} = AI_{in})\$" ///
@@ -675,7 +675,7 @@ clear all
 set more off
 
 * Change this to your do-file's directory
-local project_dir "/Users/youshan/Library/CloudStorage/Dropbox/Revealed Consistency in Food Choices/Replication Code and Data_PNAS"
+local project_dir "/Users/youshan/Documents/Research/Replication Code and Data_PNAS"
 
 local results_dir "`project_dir'/Results"
 capture mkdir "`results_dir'"
@@ -818,7 +818,7 @@ esttab pA_ios pA_like pA_care using "`tabfile'", replace ///
         c.C_treat#c.H_d "\$\text{Close}_{H_{out}} \times H_{out}\$" ///
         c.C_in#c.H_d    "\$\text{Close}_{H_{in}} \times H_{out}\$" ///
     ) ///
-    ci(3) b(3) ///
+    se(3) b(3) ///
     star(* 0.1 ** 0.05 *** 0.01) ///
     `statsblock' nonotes ///
     prehead( ///
@@ -848,7 +848,7 @@ esttab pB_ios pB_like pB_care using "`tabfile'", append ///
         c.C_treat#c.AI_s "\$\text{Close}_{AI_{in}} \times AI_{in}\$" ///
         c.C_in#c.AI_s    "\$\text{Close}_{H_{in}} \times AI_{in}\$" ///
     ) ///
-       ci(3) b(3) ///
+       se(3) b(3) ///
     star(* 0.1 ** 0.05 *** 0.01) ///
     `statsblock' nonotes ///
     prehead( ///
@@ -869,7 +869,7 @@ esttab pC_ios pC_like pC_care using "`tabfile'", append ///
         c.C_treat#c.AI_d "\$\text{Close}_{AI_{out}} \times AI_{out}\$" ///
         c.C_in#c.AI_d    "\$\text{Close}_{H_{in}} \times AI_{out}\$" ///
     ) ///
-        ci(3) b(3) ///
+        se(3) b(3) ///
     star(* 0.1 ** 0.05 *** 0.01) ///
     `statsblock' nonotes ///
     prehead( ///
@@ -901,7 +901,7 @@ clear all
 set more off
 
 * Change this to your do-file's directory
-local project_dir "/Users/youshan/Library/CloudStorage/Dropbox/Revealed Consistency in Food Choices/Replication Code and Data_PNAS"
+local project_dir "/Users/youshan/Documents/Research/Replication Code and Data_PNAS"
 
 local results_dir "`project_dir'/Results"
 capture mkdir "`results_dir'"
@@ -990,7 +990,7 @@ esttab m1 m2 m3 m4 m5 m6 ///
         c.ai_int#c.AI_s  "\$\mathrm{AI}_{\text{intensity}} \times \mathrm{AI}_{\text{in}}\$" ///
         c.ai_int#c.AI_d  "\$\mathrm{AI}_{\text{intensity}} \times \mathrm{AI}_{\text{out}}\$" ///
     ) ///
-    ci(3) b(3) ///
+    se(3) b(3) ///
     star(* 0.1 ** 0.05 *** 0.01) ///
     stats(controls N r2, ///
         label("Controls" "Observations" "\$R^2\$") ///
@@ -1034,7 +1034,7 @@ clear all
 set more off
 
 * Change this to your do-file's directory
-local project_dir "/Users/youshan/Library/CloudStorage/Dropbox/Revealed Consistency in Food Choices/Replication Code and Data_PNAS"
+local project_dir "/Users/youshan/Documents/Research/Replication Code and Data_PNAS"
 
 local results_dir "`project_dir'/Results"
 capture mkdir "`results_dir'"
@@ -1130,7 +1130,7 @@ esttab m1 m2 m3 m4 m5 m6 m7 ///
         c.temp_exp#c.AI_s "\$\mathrm{AI_{activity}} \times \mathrm{AI_{in}}\$" ///
         c.temp_exp#c.AI_d "\$\mathrm{AI_{activity}} \times \mathrm{AI_{out}}\$" ///
     ) ///
-    ci(3) b(3) ///
+    se(3) b(3) ///
     star(* 0.1 ** 0.05 *** 0.01) ///
     s(MeanAI Controls IndFE RoundFE N r2, ///
       label("Mean of \$\mathrm{AI_{activity}}\$" "Controls" "Individual FE" ///
@@ -1183,7 +1183,7 @@ clear all
 set more off
 
 * Change this to your do-file's directory
-local project_dir "/Users/youshan/Library/CloudStorage/Dropbox/Revealed Consistency in Food Choices/Replication Code and Data_PNAS"
+local project_dir "/Users/youshan/Documents/Research/Replication Code and Data_PNAS"
 
 local results_dir "`project_dir'/Results"
 capture mkdir "`results_dir'"
@@ -1276,7 +1276,7 @@ esttab m1 m2 m3 m4 ///
         c.temp_exp#c.AI_s "\$AI_{rela.} \times AI_{in}\$" ///
         c.temp_exp#c.AI_d "\$AI_{rela.} \times AI_{out}\$" ///
     ) ///
-    ci(3) b(3) ///
+    se(3) b(3) ///
     star(* 0.1 ** 0.05 *** 0.01) ///
     s(MeanRel Controls N r2, ///
         label("Mean of \$AI_{rela.}\$" "Controls" "Observations" "\$R^2\$") ///
@@ -1316,7 +1316,7 @@ esttab m5 m6 m7 m8 m9 ///
         c.temp_exp#c.AI_s "\$AI_{rela.} \times AI_{in}\$" ///
         c.temp_exp#c.AI_d "\$AI_{rela.} \times AI_{out}\$" ///
     ) ///
-    ci(3) b(3) ///
+    se(3) b(3) ///
     star(* 0.1 ** 0.05 *** 0.01) ///
     s(MeanRel Controls N r2, ///
         label("Mean of \$AI_{rela.}\$" "Controls" "Observations" "\$R^2\$") ///
